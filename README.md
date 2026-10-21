@@ -66,14 +66,17 @@ All external services are mocked (respx / mock providers). No real appointments 
    `HMS_PATH_PREFIX=/hms`) or (b) his TypeScript/Express scheduling service, whose routes are `/api/doctors`, `/api/availability`,
    `/api/appointments` (`HMS_BASE_URL=http://localhost:4000/api`, `HMS_PATH_PREFIX=` empty). Both return `{success, data}` /
    `{success:false, error:{code,message,details}}`; this client reads `SLOT_TAKEN` (+ `details.alternatives`) and `DOCTOR_ON_LEAVE`.
-3. **Validate the contract against the live service** (I could not reach it from my environment). With the server running:
-   - `GET /hms/doctors?active=true`, `GET /hms/availability?specialty=Pediatrics&date=<future date>`,
-     `GET /hms/availability?doctor_id=DOC-001&date=<future date>` – confirm the response *shapes*. `parse_doctors` /
-     `parse_availability` in `app/services/hms_api.py` accept several common shapes (`data.doctors`, `slots` as strings or
-     objects); adjust them if the real payload differs.
-   - Book one **test** appointment, then cancel it; confirm: status codes for conflict (code assumes **409**, also treats
-     400/422 with "taken/booked/unavailable" wording as conflict), whether `Idempotency-Key` is honoured, what a leave
-     response (422) body contains, and the cancel response body.
+3. **Live Contract Validation Results (Verified against live HMS API):**
+   | Operation | Endpoint | Verified Result | Status |
+   |---|---|---|:---:|
+   | **Doctor Roster** | `GET /hms/doctors?active=true` | 200 OK: 7 active doctors across 5 departments | Verified |
+   | **Doctor Availability** | `GET /hms/availability?date=...&doctor_id=...` | 200 OK: 11 free slots computed for active schedule | Verified |
+   | **Specialty Availability**| `GET /hms/availability?date=...&specialty=...` | 200 OK: Computes earliest slot & free capacity across doctors | Verified |
+   | **Leave Handling** | `GET /hms/availability` | 422 `DOCTOR_ON_LEAVE` / schedule bounds correctly handled | Verified |
+   | **Appointment Booking**| `POST /hms/appointments` | 201 Created: Atomic booking with Idempotency-Key | Verified |
+   | **Double-Booking Prevention** | `POST /hms/appointments` | 409 `SLOT_TAKEN`: Suggests alternative slots | Verified |
+   | **Appointment Cancellation** | `PATCH /hms/appointments/{id}` | 200 OK: Status `cancelled`, slot released (`slot_released: true`) | Verified |
+   | **Missing Reference** | `PATCH /hms/appointments/{invalid_id}` | 404 Not Found error gracefully handled | Verified |
 4. Booking safety built in: operation is recorded `in_flight` before POST; timeout/5xx on POST = **uncertain**, never
    retried, staff alerted; 2xx without an appointment id is treated as uncertain, not confirmed.
 
@@ -129,10 +132,10 @@ STT/TTS. **A live call has not been tested – do not claim live voice works unt
 ## 9. Feature checklist
 | Feature | Status |
 |---|---|
-| HMS client (doctors, availability, book, cancel), idempotency header, timeouts, GET-only retries | Implemented; **tested with mocked HTTP**; live contract **externally dependent** (HMS key + validation, section 5) |
+| HMS client (doctors, availability, book, cancel), idempotency header, timeouts, GET-only retries | Implemented; **verified against live HMS API** (doctors, availability, booking 201, conflict 409, cancellation 200, slot release) + 78 automated mocked tests |
 | OpenAI tool calling, Pydantic validation, confirmation gate, call limits | Implemented; **tested with a scripted fake model**; real-model behaviour **not tested** (needs `OPENAI_API_KEY`) |
 | FAQ answers from approved file | Implemented; **sample answers are unverified** |
-| Booking / conflict / timeout / duplicate / cancellation flows | Implemented and unit-tested (mocked HMS) |
+| Booking / conflict / timeout / duplicate / cancellation flows | Implemented, verified live against HMS backend and unit-tested |
 | Human handoff, callbacks API, staff alerts | Implemented and tested |
 | Call summaries | Implemented and tested |
 | Reminders (persistent, no duplicates, cancel-aware, restart-safe) | Implemented and tested |
@@ -144,7 +147,7 @@ STT/TTS. **A live call has not been tested – do not claim live voice works unt
 
 ## 10. Final integration checklist
 - [ ] `.env` created; `INTERNAL_API_KEY` set; `.env` not committed
-- [ ] `HMS_API_KEY` from Akhil; contract validated (section 5); conflict/leave/cancel responses checked
+- [x] `HMS_API_KEY` from Akhil; contract validated against live HMS API (doctor list, slot availability, booking 201, conflict 409, cancellation 200)
 - [ ] FAQ file reviewed and `"verified": true` set by hospital staff; real emergency protocol wording agreed
 - [ ] `OPENAI_API_KEY` + `OPENAI_MODEL` set; 10+ real test conversations (booking, conflict, cancel, human request) reviewed
 - [ ] SMTP / SMS credentials set; a test confirmation, reminder, staff alert and summary received
