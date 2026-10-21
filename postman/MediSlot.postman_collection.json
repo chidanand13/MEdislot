@@ -1,0 +1,334 @@
+{
+  "info": {
+    "name": "MediSlot (prototype)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000"
+    },
+    {
+      "key": "internal_key",
+      "value": "PUT-YOUR-INTERNAL_API_KEY-HERE"
+    },
+    {
+      "key": "session_id",
+      "value": ""
+    },
+    {
+      "key": "call_id",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/health",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "health"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Chat - doctors",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "X-Internal-Api-Key",
+            "value": "{{internal_key}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/chat",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "chat"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"message\": \"Which doctors do you have?\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Chat - continue session",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "X-Internal-Api-Key",
+            "value": "{{internal_key}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/chat",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "chat"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"session_id\": \"{{session_id}}\",\n  \"message\": \"What are your opening hours?\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Chat - end session (final summary)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "X-Internal-Api-Key",
+            "value": "{{internal_key}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/chat/{{session_id}}/end",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "chat",
+            "{{session_id}}",
+            "end"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        }
+      }
+    },
+    {
+      "name": "MOCK voice - inbound call",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/calls/inbound",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "calls",
+            "inbound"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"call_sid\": \"CA-TEST-1\",\n  \"from\": \"+919876543210\"\n}"
+        }
+      }
+    },
+    {
+      "name": "MOCK voice - caller speaks",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/calls/{{call_id}}/events",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "calls",
+            "{{call_id}}",
+            "events"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"call_sid\": \"CA-TEST-1\",\n  \"speech\": \"What are your opening hours?\"\n}"
+        }
+      }
+    },
+    {
+      "name": "MOCK voice - call completed",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/calls/{{call_id}}/events",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "calls",
+            "{{call_id}}",
+            "events"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"call_sid\": \"CA-TEST-1\",\n  \"status\": \"completed\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Call summary",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "X-Internal-Api-Key",
+            "value": "{{internal_key}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/calls/{{call_id}}/summary",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "calls",
+            "{{call_id}}",
+            "summary"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Create callback",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "X-Internal-Api-Key",
+            "value": "{{internal_key}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/callbacks",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "callbacks"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"reason\": \"Caller wants billing information\",\n  \"caller_number\": \"9876543210\",\n  \"patient_name\": \"Asha Verma\"\n}"
+        }
+      }
+    },
+    {
+      "name": "List callbacks",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "X-Internal-Api-Key",
+            "value": "{{internal_key}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/callbacks?status=open",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "callbacks?status=open"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Appointment reminders",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "X-Internal-Api-Key",
+            "value": "{{internal_key}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/appointments/APT-261019-5YUQEO/reminders",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "appointments",
+            "APT-261019-5YUQEO",
+            "reminders"
+          ]
+        }
+      }
+    }
+  ]
+}

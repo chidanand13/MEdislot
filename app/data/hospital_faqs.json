@@ -1,0 +1,40 @@
+{
+  "_notice": "SAMPLE DATA - NOT VERIFIED. The hospital team must review and replace every answer before real use. Set \"verified\": true only after verification. The AI may only answer hospital questions from this file.",
+  "faqs": [
+    {
+      "id": "opening_hours",
+      "topic": "Hospital opening hours",
+      "keywords": ["hours", "open", "opening", "close", "closing", "timing", "timings", "time", "visiting"],
+      "answer": "SAMPLE: Outpatient clinics are open Monday to Saturday, 9 AM to 6 PM. Emergency services run 24 hours.",
+      "verified": false
+    },
+    {
+      "id": "location",
+      "topic": "Hospital location",
+      "keywords": ["location", "address", "where", "directions", "reach", "located", "map", "parking"],
+      "answer": "SAMPLE: The hospital is at 12 Example Road, Sample Nagar, Bengaluru 560001. (Replace with the real address.)",
+      "verified": false
+    },
+    {
+      "id": "departments",
+      "topic": "Available departments",
+      "keywords": ["department", "departments", "specialty", "specialties", "speciality", "services", "treat"],
+      "answer": "SAMPLE: General Medicine, Pediatrics, Cardiology, Dermatology and Orthopedics. For the live list of doctors and specialties I can check the hospital system for you.",
+      "verified": false
+    },
+    {
+      "id": "booking_process",
+      "topic": "Appointment booking process",
+      "keywords": ["book", "booking", "appointment", "schedule", "process", "how", "reserve", "cancel", "reschedule"],
+      "answer": "SAMPLE: You can book by telling me the specialty or doctor, your preferred date and time, your name and phone number. I will check live availability, read the details back, and book only after you confirm. A confirmation message is sent after the booking is confirmed.",
+      "verified": false
+    },
+    {
+      "id": "contact_staff",
+      "topic": "Contacting hospital staff",
+      "keywords": ["contact", "staff", "phone", "email", "reception", "human", "call", "reach", "speak"],
+      "answer": "SAMPLE: Reception can be reached on +91 00000 00000 (placeholder) during clinic hours, or I can request a callback from our staff.",
+      "verified": false
+    }
+  ]
+}
